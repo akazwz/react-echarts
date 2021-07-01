@@ -1,31 +1,88 @@
 import * as echarts from "echarts"
-import {useEffect} from "react";
+import {useEffect, useState, useRef} from "react";
 
 function MyBarChart() {
+    const initWidth = window.innerWidth;
+    const initHeight = window.innerHeight;
+    const chartBoxRef = useRef(null);
+
+    const [state, setState] = useState({
+        width: initWidth,
+        height: initHeight,
+        chartBoxWidth: initWidth * 0.9,
+        chartBoxHeight: initHeight * 0.3,
+    });
+
+    const {width, height, chartBoxWidth, chartBoxHeight} = state
+
     const initChart = () => {
         let barChart = echarts.init(document.getElementById('chart-box'))
-        barChart.setOption({
-            title: {
-                text: 'ECharts 入门示例'
+        let option = {
+            dataset: {
+                source: [
+                    ['score', 'amount', 'product'],
+                    [89.3, 58212, 'Matcha Latte'],
+                    [57.1, 78254, 'Milk Tea'],
+                    [74.4, 41032, 'Cheese Cocoa'],
+                    [50.1, 12755, 'Cheese Brownie'],
+                    [89.7, 20145, 'Matcha Cocoa'],
+                    [68.1, 79146, 'Tea'],
+                    [19.6, 91852, 'Orange Juice'],
+                    [10.6, 101852, 'Lemon Juice'],
+                    [32.7, 20112, 'Walnut Brownie']
+                ]
             },
-            tooltip: {},
-            xAxis: {
-                data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
-            },
-            yAxis: {},
-            series: [{
-                name: '销量',
-                type: 'bar',
-                data: [5, 20, 36, 10, 10, 20]
-            }]
+            xAxis: {},
+            yAxis: {type: 'category'},
+            series: [
+                {
+                    type: 'bar',
+                    encode: {
+                        // 将 "amount" 列映射到 X 轴。
+                        x: 'amount',
+                        // 将 "product" 列映射到 Y 轴。
+                        y: 'product'
+                    }
+                }
+            ]
+        };
+        barChart.setOption(option)
+    }
+    const handleResize = (e) => {
+        const width = e.target.innerWidth
+        const height = e.target.innerHeight
+        let chartBoxHeight = width * 0.9 * 0.5
+        if (chartBoxHeight > 500) {
+            chartBoxHeight = 500
+        }
+        setState({
+            width: width,
+            height: height,
+            chartBoxWidth: width * 0.9,
+            chartBoxHeight: chartBoxHeight,
         })
+        let chartInstance = echarts.getInstanceByDom(document.getElementById('chart-box'))
+        chartInstance.resize()
     }
     useEffect(function () {
         initChart()
+        window.addEventListener('resize', handleResize)
     }, [])
     return (
-        <div>
-            <div id="chart-box" style={{width: '100%', height: 333}}/>
+        <div style={{
+            textAlign: "center"
+        }}>
+            <div ref={chartBoxRef} id="chart-box" style={{
+                width: chartBoxWidth,
+                height: chartBoxHeight,
+                maxHeight: 400,
+                backgroundColor: "rebeccapurple",
+                margin: "auto"
+            }}/>
+            <p>宽度:{width}</p>
+            <p>高度:{height}</p>
+            <p>图表容器宽度:{chartBoxWidth}</p>
+            <p>图表容器高度:{chartBoxHeight}</p>
         </div>
     )
 }
