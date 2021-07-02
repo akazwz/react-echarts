@@ -1,12 +1,12 @@
 import './App.css';
 import Test from "./components/Test";
-import ChartPage from "./pages/ChartPage";
+import MyBarRace from "./components/MyBarRace";
 
 function App() {
     return (
         <div className="App">
             <Test/>
-            <ChartPage/>
+            <MyBarRace/>
         </div>
     );
 }
